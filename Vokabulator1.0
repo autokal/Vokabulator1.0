@@ -1,0 +1,87 @@
+
+from random import randint
+import random
+from googletrans import Translator
+import pickle
+
+
+translator = Translator()
+woerter = dict()
+
+with open('Vokabelheft.pkl', 'rb') as f:
+    woerter = pickle.load(f)
+
+print('\nVersion 2.1  (printall.version)\n'
+      'Der Vokabulator 2.1 wurde erfolgreich gestartet\n'
+      'Die Datenbank wurde aktualisiert\n\n'
+      'Tippe : übersetzen, eingabe, abfrage oder beenden')
+
+def übersetzen():
+    count = 1
+    while count < 2:
+        englisch = input('eng: ')
+        i = translator.translate(englisch, sry='en', dest='de')     
+        deutsch = i.text
+        if englisch == '#fertig':                                   
+            return
+        if englisch == deutsch:                                     
+            return
+        if deutsch in woerter:                                      
+            print('--> ' + deutsch)
+            print(englisch + ' hast du schon mal übersetzt. Bitte lernen')
+        else:
+            print('--> ' + deutsch)
+            woerter[deutsch] = englisch
+
+
+
+def eingabe():
+    while True:
+        deutsch = input('Deutsches Wort: ')
+        if deutsch in woerter:
+            print('Bereits in der Datenbank')
+            return
+        if deutsch == '#fertig':
+            return
+        englisch = input('Englisches  Wort: ')
+        if englisch == '#fertig':
+            return
+        woerter[deutsch] = englisch
+
+def beenden():
+    with open('Vokabelheft.pkl', 'wb') as f:
+        pickle.dump(woerter, f, pickle.HIGHEST_PROTOCOL)
+
+def abfrage():
+    
+    while True:
+        de = random.choice(list(woerter.keys()))
+        quiz = input('englische Übersetzung von -> ' + de + '\n')
+        if quiz == '#fertig':
+            return
+        if quiz == woerter[de]:
+            print('richtig')
+        else:
+            print('falsch')
+            print(woerter[de])
+
+while True:
+    befehl = input('Befehl: ')
+
+    if befehl == 'übersetzen':
+        übersetzen()
+    if befehl == 'eingabe':
+        eingabe()
+    elif befehl == 'abfrage':
+        print('____________\nGood luck\n____________')
+        abfrage()
+    elif befehl == 'printall':
+        print(woerter)
+    elif befehl == 'beenden':
+        print('___________\nGood bye\n____________')
+        beenden()
+        #automatisch speichern in DB
+        break
+    else:
+        print('keine bekannte Ausgabe. '
+              'Tippe : übersetzen, eingabe, abfrage oder beenden')
